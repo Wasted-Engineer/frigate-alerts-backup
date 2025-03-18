@@ -33,10 +33,6 @@ if [ ! -d "$USB_PATH" ]; then
     exit 1
 fi
 
-# Crear carpeta con la fecha del día
-DATE_FOLDER="$USB_PATH/Recordings/$TODAY"
-mkdir -p "$DATE_FOLDER"
-
 echo "Buscando alertas en la base de datos..."
 ALERTS=$(sqlite3 "$LATEST_DB" "SELECT id, camera, datetime(start_time, 'unixepoch'), datetime(end_time, 'unixepoch'), has_clip FROM event WHERE date(datetime(start_time, 'unixepoch')) = date('now');")
 
@@ -94,10 +90,14 @@ for ALERT in $ALERTS; do
         echo "Inicio: $START_TIME"
         echo "Fin: $END_TIME"
 
-        ALERT_PATH="$DATE_FOLDER/$ID"
+        # Extraer hora de inicio
+        HOUR=$(date -d "$START_TIME" +%H)
+
+        # Definir la ruta correcta según la estructura de Frigate
+        ALERT_PATH="$USB_PATH/Recordings/$TODAY/$HOUR/$CAMERA"
         mkdir -p "$ALERT_PATH"
 
-        CLIPS_PATH="$RECORDINGS_PATH/$(date -d "$START_TIME" +%Y-%m-%d)/$(date -d "$START_TIME" +%H)/$CAMERA"
+        CLIPS_PATH="$RECORDINGS_PATH/$(date -d "$START_TIME" +%Y-%m-%d)/$HOUR/$CAMERA"
         echo "Buscando vídeos en: $CLIPS_PATH"
 
         DURATION=$(( $(date -d "$END_TIME" +%s) - $(date -d "$START_TIME" +%s) ))
