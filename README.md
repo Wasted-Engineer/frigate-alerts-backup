@@ -14,3 +14,4 @@ This script backs up your Frigate alerts manually. It doesn't run automatically,
 While the backup process is manual, it can easily be automated using cron or another scheduler to run at specific intervals.
 
 I have tested it with one camera, and it works as expected.
+
